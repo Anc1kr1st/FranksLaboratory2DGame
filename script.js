@@ -1,6 +1,7 @@
 
 window.addEventListener('load', function(){
-                        const canvas = document.getElementById('canvas1');
+  // canvas setup
+     const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
 canvas.width = 500;
 canvas.height = 500;
@@ -15,14 +16,12 @@ class InputHandler{
         this.game.keys.push(e.key);
       } else if ( e.key === ' '){
       this.game.player.shootTop();
-    }
-     
+    } 
     });
     window.addEventListener('keyup', e =>{
       if (this.game.keys.indexOf(e.key) > -1){
         this.game.keys.splice(this.game.keys.indexOf(e.key), 1);
       }
-     
     });
   }
 }
@@ -30,19 +29,19 @@ class Projectile {
     constructor(game, x, y){
       this.game = game,
       this.x = x;
-  this.y = y;
-  this.width = 10;
-  this.height = 3;
-  this.speed = 3;
-  this.markedForDeletion = false;
+      this.y = y;
+      this.width = 10;
+      this.height = 3;
+      this.speed = 3;
+      this.markedForDeletion = false;
     }
     update(){
      this.x += this.speed;
       if (this.x > this.game.width * 0.8) this.markedForDeletion = true;      
     }
-  draw(context){
-    context.fillStyle = 'yellow';
-    context.fillRect(this.x, this.y, this.width, this.height);
+      draw(context){
+      context.fillStyle = 'yellow';
+      context.fillRect(this.x, this.y, this.width, this.height);
   }
 }
 
@@ -84,7 +83,7 @@ class Player{
   shootTop  (){
     if (this.game.ammo > 0){
     this.projectiles.push(new Projectile(this.game, this.x + 80, this.y + 30));
-    this.game.amoo--;
+    this.game.ammo--;
     
     }
   }
@@ -96,8 +95,8 @@ class Enemy{
     this.x = this.game.width;
     this.speedX = Math.random() * -1.5 - 0.5;
     this.markedForDeletion = false;
-    this.live = 5;
-    this.score = this.live;
+    this.lives = 5;
+    this.score = this.lives;
   }
   update(){
     this.x += this.speedX;
@@ -105,17 +104,17 @@ class Enemy{
   }
   draw(context){
     context.fillStyle = 'red';
-    context.fillRect(this.x, this.y, this.width, thiw.height);
+    context.fillRect(this.x, this.y, this.width, this.height);
     context.fillStyle = 'black';
     context.font = '20px Helvetica';
-    context.fillText(this.live, this.x, this.y);
+    context.fillText(this.lives, this.x, this.y);
   }
 }
 class Angler1 extends Enemy  {
   constructor(game){
     super(game);
-    this.width = 228;
-    this.height = 169;
+    this.width = 228 * 0.2;
+    this.height = 169 * 0.2;
     this.y = Math.random() * (this.game.height * 0.9 - this.height);
   }
 }
@@ -133,19 +132,18 @@ class UI{
       this.game = game;
       this.fontSize = 25;
       this.fontFamily = 'Helvetica';
-      this.color = 'white';
+      this.color = 'yellow';
     }
     draw(context){
       context.save();
       context.fillStyle = this.color;
-      context.shadowOffesetX = 2;
+      context.shadowOffsetX = 2;
       context.shadowOffsetY = 2;
       context.shadowColor = 'black';
       context.font = this.fontSize + 'px' + this.fontFamily;
       // score
       context.fillText(this.game.score, 20, 40);
       // ammo
-     
       for (let i = 0; i < this.game.ammo; i++){
         context.fillRect(20 + 5 * i, 50, 3, 20);
       }
@@ -215,6 +213,7 @@ class Game{
     }
   addEnemy(){
     this.enemies.push(new Angler1(this));
+    console.log(this.enemies);
   }
   checkCollision(rect1, rect2){
     return ( rect1.x < rect2.x + rect2.width && 
@@ -231,7 +230,7 @@ function animate(timeStamp){
     const deltaTime = timeStamp - lastTime;
     lastTime = timeStamp;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    game.update();
+    game.update(deltaTime);
     game.draw(ctx);
     requestAnimationFrame(animate);
   }
